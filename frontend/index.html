@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Food Donation Connect</title>
+  <meta name="description" content="Coordinate surplus food donations between donors and community groups.">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="brand">
+      <span class="brand-mark">🍲</span>
+      <div>
+        <strong>Food Donation Connect</strong>
+        <small>Share food. Support communities.</small>
+      </div>
+    </div>
+    <nav id="main-nav" class="hidden">
+      <button data-view="dashboard">Dashboard</button>
+      <button data-view="donations">Donations</button>
+      <button data-view="my-activity">My Activity</button>
+      <button id="admin-nav" class="hidden" data-view="admin">Admin</button>
+      <button id="logout-btn" class="outline">Logout</button>
+    </nav>
+  </header>
+
+  <main>
+    <section id="auth-view" class="auth-shell">
+      <div class="hero-copy">
+        <p class="eyebrow">FOOD • PEOPLE • COMMUNITY</p>
+        <h1>Turn surplus food into meaningful support.</h1>
+        <p>Food Donation Connect helps donors publish available food and lets community groups request suitable donations during clear pickup windows.</p>
+        <div class="feature-row">
+          <span>✓ Pickup windows</span>
+          <span>✓ Claim requests</span>
+          <span>✓ Role-based access</span>
+        </div>
+      </div>
+
+      <div class="auth-card">
+        <div class="tabs">
+          <button class="tab active" data-auth="signin">Sign in</button>
+          <button class="tab" data-auth="signup">Create account</button>
+        </div>
+
+        <form id="signin-form" class="auth-form">
+          <label>Email<input type="email" id="signin-email" required autocomplete="email"></label>
+          <label>Password<input type="password" id="signin-password" required autocomplete="current-password"></label>
+          <button class="primary" type="submit">Sign in</button>
+          <p class="form-note">Admin access is configured on the server; never place admin credentials in frontend code.</p>
+        </form>
+
+        <form id="signup-form" class="auth-form hidden">
+          <label>Full name<input type="text" id="signup-name" required minlength="2"></label>
+          <label>Email<input type="email" id="signup-email" required></label>
+          <label>Phone (optional)<input type="tel" id="signup-phone"></label>
+          <label>Account type
+            <select id="signup-role" required>
+              <option value="community">Community group</option>
+              <option value="donor">Food donor</option>
+            </select>
+          </label>
+          <label>Password<input type="password" id="signup-password" required minlength="8"></label>
+          <button class="primary" type="submit">Create account</button>
+        </form>
+      </div>
+    </section>
+
+    <section id="app-view" class="hidden">
+      <div id="toast" class="toast hidden"></div>
+
+      <section id="dashboard-view" class="view">
+        <div class="page-heading">
+          <div>
+            <p class="eyebrow">YOUR SPACE</p>
+            <h2 id="welcome-title">Dashboard</h2>
+            <p id="welcome-text"></p>
+          </div>
+          <button id="quick-action" class="primary">Find donations</button>
+        </div>
+        <div id="stats-grid" class="stats-grid"></div>
+        <div class="dashboard-grid">
+          <div class="panel">
+            <div class="panel-heading"><h3>Available food</h3><button data-view="donations" class="text-btn">View all</button></div>
+            <div id="dashboard-donations" class="card-list"></div>
+          </div>
+          <div class="panel">
+            <div class="panel-heading"><h3>How it works</h3></div>
+            <ol class="steps">
+              <li><b>Publish</b><span>Donors add food, quantity and a pickup window.</span></li>
+              <li><b>Request</b><span>Community groups request donations that fit their needs.</span></li>
+              <li><b>Coordinate</b><span>Donors approve a claim and both sides see the status.</span></li>
+              <li><b>Complete</b><span>After pickup, the community group marks the claim complete.</span></li>
+            </ol>
+          </div>
+        </div>
+      </section>
+
+      <section id="donations-view" class="view hidden">
+        <div class="page-heading">
+          <div><p class="eyebrow">FOOD BOARD</p><h2>Available donations</h2><p>Browse current food offers and request one that suits your community.</p></div>
+          <button id="new-donation-btn" class="primary hidden">+ Post donation</button>
+        </div>
+        <div class="toolbar">
+          <input id="donation-search" type="search" placeholder="Search food name...">
+          <select id="donation-filter">
+            <option value="available">Available only</option>
+            <option value="">All statuses</option>
+          </select>
+        </div>
+        <div id="donations-list" class="card-grid"></div>
+      </section>
+
+      <section id="my-activity-view" class="view hidden">
+        <div class="page-heading">
+          <div><p class="eyebrow">ACTIVITY</p><h2>My activity</h2><p id="activity-description"></p></div>
+        </div>
+        <div id="activity-list" class="card-grid"></div>
+      </section>
+
+      <section id="admin-view" class="view hidden">
+        <div class="page-heading"><div><p class="eyebrow">ADMINISTRATION</p><h2>Admin dashboard</h2><p>Monitor platform activity and manage accounts.</p></div></div>
+        <div id="admin-stats" class="stats-grid"></div>
+        <div class="panel">
+          <div class="panel-heading"><h3>Users</h3></div>
+          <div class="table-wrap"><table><thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Joined</th><th></th></tr></thead><tbody id="admin-users"></tbody></table></div>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <dialog id="donation-dialog">
+    <form id="donation-form" method="dialog" class="dialog-card">
+      <div class="panel-heading"><h3>Post a food donation</h3><button type="button" class="icon-btn" id="close-donation">×</button></div>
+      <label>Food name<input id="food-name" required maxlength="120"></label>
+      <label>Description<textarea id="food-description" rows="3" maxlength="500" placeholder="Optional details, allergens, packaging, etc."></textarea></label>
+      <div class="form-grid">
+        <label>Quantity<input id="food-quantity" type="number" min="0.01" step="0.01" required></label>
+        <label>Unit<select id="food-unit" required><option>kg</option><option>litres</option><option>packets</option><option>boxes</option><option>meals</option><option>items</option></select></label>
+      </div>
+      <div class="form-grid">
+        <label>Pickup starts<input id="pickup-start" type="datetime-local" required></label>
+        <label>Pickup ends<input id="pickup-end" type="datetime-local" required></label>
+      </div>
+      <label>Pickup location<input id="pickup-location" required maxlength="250"></label>
+      <div class="dialog-actions"><button type="button" class="outline" id="cancel-donation">Cancel</button><button class="primary" type="submit">Publish donation</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="claim-dialog">
+    <form id="claim-form" method="dialog" class="dialog-card">
+      <div class="panel-heading"><h3>Request this donation</h3><button type="button" class="icon-btn" id="close-claim">×</button></div>
+      <input type="hidden" id="claim-donation-id">
+      <p id="claim-summary" class="summary-box"></p>
+      <label>Message to donor<textarea id="claim-message" rows="4" maxlength="500" placeholder="Tell the donor how this food will help your community."></textarea></label>
+      <div class="dialog-actions"><button type="button" class="outline" id="cancel-claim">Cancel</button><button class="primary" type="submit">Send request</button></div>
+    </form>
+  </dialog>
+
+  <script src="app.js"></script>
+</body>
+</html>
